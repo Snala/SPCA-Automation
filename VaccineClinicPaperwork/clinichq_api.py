@@ -38,7 +38,7 @@ class ClinicHQ:
 				raise Exception('Bad request, status code: {}'.format(result.status_code))
 			return result
 		elif request_type == 'post':
-			result =  self.session.post(self.hostname + url, headers=self.headers, json=payload)
+			result = self.session.post(self.hostname + url, headers=self.headers, json=payload)
 			if result.status_code != 200:
 				raise Exception('Bad request, status code: {}'.format(result.status_code))
 			return result
@@ -122,19 +122,12 @@ class Details:
 						start_time = datetime.datetime.strptime(appointment['startTime'], "%H:%M:%S")
 						start_time = start_time.strftime("%#I:%M")
 						vaccine_reminder_document.write(
-							"{},{},{},({}),{}\n".format(start_time, appointment['animalName'],
-														appointment['animalNumber'], appointment['clientName'],
-														appointment['species']))
+							"{},{},{},({}),{}\n".format(start_time, appointment['animalName'], appointment['animalNumber'], appointment['clientName'], appointment['species']))
 						for vaccine in vaccine_reminders_list:
 							try:
-								if datetime.datetime.strptime(vaccine_reminders_list[vaccine],
-															  "%m/%d/%Y") < datetime.datetime.strptime(query_date,
-																									   "%Y-%m-%d"):
+								if datetime.datetime.strptime(vaccine_reminders_list[vaccine], "%m/%d/%Y") < datetime.datetime.strptime(query_date, "%Y-%m-%d"):
 									alert = "!-"
-								elif datetime.datetime.strptime(vaccine_reminders_list[vaccine],
-																"%m/%d/%Y") < datetime.datetime.strptime(query_date,
-																										 "%Y-%m-%d") + relativedelta(
-										months=+6):
+								elif datetime.datetime.strptime(vaccine_reminders_list[vaccine], "%m/%d/%Y") < datetime.datetime.strptime(query_date, "%Y-%m-%d") + relativedelta(months=+6):
 									alert = "+-"
 								else:
 									alert = "  "
@@ -155,6 +148,7 @@ class Details:
 	def parse_pdf(self):
 		count = 0
 		for appointment in self.appointment_list:
+			# noinspection PyUnresolvedReferences
 			doc = fitz.open(os.path.join(pathlib.Path().absolute(), 'pdfs/' + str(appointment['id']) + '.pdf'))
 			search_terms = []
 			if str(appointment['species']).lower() == 'dog':
@@ -188,8 +182,8 @@ class Details:
 				clip = fitz.Rect(mp, rect.br)  # the area we want
 				# page.draw_rect(clip, color=None, fill=None, overlay=False)
 				for term in search_terms:
-					iRects = page.search_for(term, clip=clip, quad=False)
-					for i in iRects:
+					i_rects = page.search_for(term, clip=clip, quad=False)
+					for i in i_rects:
 						if i in clip:
 							page.draw_rect(i, color=(0, 0, 0), fill=None, overlay=False)  # draw i
 			elif str(appointment['species']).lower() == 'dog':
@@ -198,8 +192,8 @@ class Details:
 				clip = fitz.Rect(rect.x0, rect.y1/2, rect.x1/3, rect.y1)
 				# page.draw_rect(clip, color=(0, 0, 0), fill=(0, 0, 0), overlay=True)
 				for term in search_terms:
-					iRects = page.search_for(term, clip=clip, quad=False)
-					for i in iRects:
+					i_rects = page.search_for(term, clip=clip, quad=False)
+					for i in i_rects:
 						if i in clip:
 							page.draw_rect(i, color=(0, 0, 0), fill=None, overlay=False)  # draw i
 			else:
@@ -215,10 +209,12 @@ class Details:
 		destination_path = os.path.join(Path.home(), "Downloads", "Vaccination Releases " + datetime.date.today().strftime("%d-%m-%Y") + ".pdf")
 		directory_list = glob.glob(os.path.join(pathlib.Path().absolute(), 'completed/', '*.pdf'))
 		directory_list.sort(reverse=False)
+		# noinspection PyUnresolvedReferences
 		result = fitz.open()
 		for pdf in directory_list:
-			with fitz.open(pdf) as mfile:
-				result.insert_pdf(mfile)
+			# noinspection PyUnresolvedReferences
+			with fitz.open(pdf) as merged_file:
+				result.insert_pdf(merged_file)
 		result.save(destination_path, garbage=1, deflate=True, clean=True)
 
 	@staticmethod
@@ -231,7 +227,7 @@ class Details:
 
 
 if __name__ == "__main__":
-	start_time = time.time()
+	program_start = time.time()
 	print("Starting!")
 	test = Details()
 	query_date = '2022-06-11'
@@ -250,4 +246,4 @@ if __name__ == "__main__":
 	print("Done, cleaning up.")
 	test.cleanup()
 	print("Cleanup done, exiting.")
-	print("--- Completed in %s seconds ---" % (time.time() - start_time))
+	print("--- Completed in %s seconds ---" % (time.time() - program_start))
