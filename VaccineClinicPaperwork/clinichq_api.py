@@ -5,6 +5,7 @@ import re
 import datetime
 import fitz
 import glob
+import time
 from json import load
 from pathlib import Path
 from dateutil.relativedelta import relativedelta
@@ -230,6 +231,7 @@ class Details:
 
 
 if __name__ == "__main__":
+	start_time = time.time()
 	print("Starting!")
 	test = Details()
 	query_date = '2022-06-11'
@@ -248,3 +250,4 @@ if __name__ == "__main__":
 	print("Done, cleaning up.")
 	test.cleanup()
 	print("Cleanup done, exiting.")
+	print("--- Completed in %s seconds ---" % (time.time() - start_time))
