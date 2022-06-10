@@ -237,6 +237,8 @@ if __name__ == "__main__":
 	appointment_list = test.get_appointment_list(query_date)
 	print('Generating Reminder Summary List')
 	test.generate_reminder_summary()
+	print("Done, pre-cleaning temporary directories")
+	test.cleanup()
 	print("Done, retrieving the PDF's")
 	test.download_all_pdfs()
 	print("All pdf's downloaded, parsing and marking up..")
