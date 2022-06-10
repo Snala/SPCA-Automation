@@ -128,3 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 /VaccineClinicPaperwork/authentication.json
+/VaccineClinicPaperwork/pdfs/
+/VaccineClinicPaperwork/completed/
