@@ -9,7 +9,7 @@
 
   !define NAME "SPCANN - ClinicPaperwork"
   !define MUI_FILE "ClinicPaperwork"
-  !define VERSION "1.0"
+  !define VERSION "1.1"
   !define MUI_BRANDINGTEXT "ClinicPaperwork"
   !define SLUG "${NAME} v${VERSION}"
   !define ProjectDir "C:\Users\Ohana\PycharmProjects\SPCA-Automation"
