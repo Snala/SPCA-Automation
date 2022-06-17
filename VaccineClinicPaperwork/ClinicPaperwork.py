@@ -27,7 +27,7 @@ class ClinicHQ:
 			0].replace('value="', '')
 		payload['__RequestVerificationToken'] = token
 		self.session.post(self.hostname + '/account/login', headers=self.headers, data=payload)
-		check_login = self.session.get(self.hostname + '/api/paperwork/appointments/2022-06-10?sortOrder=5')
+		check_login = self.session.get(self.hostname + '/api/lookup/me')
 		try:
 			check_login.json()
 		except json.JSONDecodeError:
@@ -160,10 +160,15 @@ class Details:
 							date[1] = '0' + str(date[1])
 						if len(date[2]) < 4:
 							date[2] = '20' + str(date[2])
+						if len(date[2]) > 4:
+							date[2] = str(date[2][0])
 						date = str("{}/{}/{}").format(date[0], date[1], date[2])
 						if vaccine in reminders:
-							if datetime.datetime.strptime(date, "%m/%d/%Y") > datetime.datetime.strptime(
-									reminders[vaccine], "%m/%d/%Y"):
+							try:
+								if datetime.datetime.strptime(date, "%m/%d/%Y") > datetime.datetime.strptime(reminders[vaccine], "%m/%d/%Y"):
+									reminders[vaccine] = date
+							except ValueError:
+								# If we cannot determine the date, because of bad data, return the bad data and let it be printed out.
 								reminders[vaccine] = date
 						else:
 							reminders[vaccine] = date
