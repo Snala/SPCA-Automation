@@ -160,8 +160,6 @@ class Details:
 							date[1] = '0' + str(date[1])
 						if len(date[2]) < 4:
 							date[2] = '20' + str(date[2])
-						if len(date[2]) > 4:
-							date[2] = str(date[2][0])
 						date = str("{}/{}/{}").format(date[0], date[1], date[2])
 						if vaccine in reminders:
 							try:
