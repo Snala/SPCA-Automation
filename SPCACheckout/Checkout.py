@@ -2,6 +2,7 @@ import PySimpleGUI as sg
 import json
 from SPCACheckout import api
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 sg.theme('TanBlue')
 
@@ -81,8 +82,7 @@ def main_window(session, appointment_id: int):
 		[sg.Push(), sg.Text('Primary Color')],
 		[sg.Push(), sg.Text('Age Years')],
 		[sg.Push(), sg.Text('Known health issues?')],
-		[sg.Push(), sg.Text('Ever Reacted to a Vaccine?')],
-		[sg.Push(), sg.Text('Behavior Alert')]
+		[sg.Push(), sg.Text('Ever Reacted to a Vaccine?')]
 	]
 
 	right_fields = [
@@ -92,8 +92,7 @@ def main_window(session, appointment_id: int):
 		[sg.Combo(list(map(lambda x: x['title'], colors)), default_value=appointment_details['primaryColor'], key='primary_color'), sg.Text('Secondary Color'), sg.Combo(list(map(lambda x: x['title'], colors)), default_value=appointment_details['secondaryColor'], key='secondary_color'), sg.Push()],
 		[sg.Combo(ageYearOptions, default_value=appointment_details['ageYears'], key='age_years'), sg.Text('Age Months'), sg.Combo(ageMonthOptions, default_value=appointment_details['ageMonths'], key='age_months'), sg.Text('Spayed/Neutered?'), sg.Combo(['Yes', 'No', 'Unknown'], key='altered', size=(4, 1), default_value=bool_to_yes_no(appointment_details['isSpayedNeutered'])), sg.Push()],
 		[sg.Combo(['', 'Yes', 'No'], default_value=medical_attributes['health_issues'], key='health_issues'), sg.Text('On Medication/Pregnant?'), sg.Combo(['', 'Yes', 'No'], key='meds_pregnant', default_value=medical_attributes['meds_pregnant'])],
-		[sg.Combo(['', 'Yes', 'No'], key='vaccine_reaction', default_value=medical_attributes['vaccine_reactions']), sg.Text('If so, which vaccine?'), sg.InputText(size=(20, 1), key='which_vaccine_reaction', default_text=medical_attributes['vaccines_reacted_to']), sg.Push()],
-		[sg.Checkbox('', key='animal_caution', default=appointment_details['animalCaution']), sg.Push(), sg.Button('Save')]
+		[sg.Combo(['', 'Yes', 'No'], key='vaccine_reaction', default_value=medical_attributes['vaccine_reactions']), sg.Text('If so, which vaccine?'), sg.InputText(size=(20, 1), key='which_vaccine_reaction', default_text=medical_attributes['vaccines_reacted_to']), sg.Push()]
 	]
 
 	vaccines_list = [
@@ -120,7 +119,7 @@ def main_window(session, appointment_id: int):
 			vaccines_available.pop(vaccines_available.index(vaccine['name']))
 	vaccines_list.append([sg.HorizontalSeparator()])
 	vaccines_list.append([sg.Push(), sg.Text('Sub-Total:  ${:.2f}'.format(vaccine_total))])
-	vaccines_list.insert(0, [sg.Text('Add Vaccine:'), sg.Combo(vaccines_available, key='add_vaccine')])
+	vaccines_list.insert(0, [sg.Text('Add Vaccine:'), sg.Combo(vaccines_available, key='add_vaccine'), sg.Button('Add')])
 
 	final_total = vaccine_total
 	for payment in payment_details['payments']:
@@ -133,9 +132,31 @@ def main_window(session, appointment_id: int):
 	vaccines_list.append([sg.HorizontalSeparator()])
 	vaccines_list.append([sg.Push(), sg.Text('Remaining Balance: {:.2f}'.format(final_total))])
 
+	wellness_rabies = [
+		[sg.Push(), sg.Text("Wellness", font=('Arial', 14, 'bold')), sg.Push()],
+		[sg.Push(), sg.Text('Behavior Alert'), sg.Checkbox('', key='animal_caution', default=appointment_details['animalCaution']), sg.Push()],
+		[sg.Push(), sg.Text('Respiratory'), sg.Combo(['Normal', 'Abnormal'], key='respiratory', default_value='Normal'), sg.Push()],
+		[sg.Push(), sg.Text('Weight'), sg.InputText('', size=(5, 1), key='weight'), sg.Push()],
+		[sg.Push(), sg.Text('Temperature'), sg.InputText('', size=(5, 1), key='temperature'), sg.Push()],
+		[sg.HorizontalSeparator()],
+		[sg.Push(), sg.Text("Rabies", font=('Arial', 14, 'bold')), sg.Push()],
+		[sg.Push(), sg.Text('Vaccine {}')],
+		[sg.Push(), sg.Text('Manufacturer'), sg.InputText("", justification='left', size=(10, 1), key='rabies_mfg')],
+		[sg.Push(), sg.Text('Date'), sg.InputText(datetime.now().date(), justification='left', size=(10, 1), key='rabies_date')],
+		[sg.Push(), sg.Text('Expires'), sg.InputText(datetime.now().date() + relativedelta(years=1), justification='left', size=(10, 1), key='rabies_exp')],
+		[sg.Push(), sg.Text('Tag Number'), sg.InputText("", justification='left', size=(10, 1), key='rabies_tag_number')],
+		[sg.Push(), sg.Text('Lot Number'), sg.InputText("", justification='left', size=(10, 1), key='rabies_lot_number')],
+		[sg.Push(), sg.Text('Lot Expiration Date'), sg.InputText("", justification='left', size=(10, 1), key='rabies_lot_exp')],
+		[sg.VPush()]
+	]
+
+	payments = []
+
 	layout = [[sg.Column(left_titles), sg.Column(left_fields), sg.VerticalSeparator(), sg.Column(right_titles), sg.Column(right_fields)],
 			  [sg.HorizontalSeparator()],
-			  [sg.Column(vaccines_list), sg.VerticalSeparator()]]
+			  [sg.Column(vaccines_list), sg.VerticalSeparator(), sg.Column(wellness_rabies), sg.VerticalSeparator(), sg.Column(payments)],
+	]
+
 	return sg.Window('SPCA NN - Checkout', layout).finalize()
 
 
