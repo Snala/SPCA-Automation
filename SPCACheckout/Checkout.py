@@ -36,6 +36,8 @@ def main_window(session, appointment_id: int):
 	medical_attributes = session.get_animal_medical(appointment_id)
 	payment_details = session.get_payment_details(appointment_id)
 	services_list = session.services_lookup(int(appointment_details['genderTypeId']), int(appointment_details['speciesId']))
+	veterinarians = list(map(lambda x: x['value'], session.vet_lookup()))
+	microchip_providers_list = list(map(lambda x: x['name'], session.microchip_providers()))
 	vaccines_available = []
 	for service in services_list:
 		if service['type'] == 'Vaccine':
@@ -97,7 +99,7 @@ def main_window(session, appointment_id: int):
 
 	vaccines_list = [
 		[sg.HorizontalSeparator()],
-		[sg.Push(), sg.Text('Vaccine', size=(30, 1)), sg.Push(), sg.Text('Reminder'), sg.Push(), sg.Text('Price')]
+		[sg.Push(), sg.Text('Vaccine', size=(35, 1)), sg.Push(), sg.Text('Reminder'), sg.Push(), sg.Text('Price')]
 	]
 	vaccine_total = float()
 	for vaccine in financial_details:
@@ -113,7 +115,7 @@ def main_window(session, appointment_id: int):
 				if '3yr' not in reminder_options:
 					reminder_options.append('3yr')
 		reminder_options.insert(0, '')
-		vaccines_list.append([sg.Push(), sg.Checkbox(vaccine['name'], key='vaccine_{}'.format(vaccine['id']), size=(30, 1), default=True), sg.Push(), sg.Combo(reminder_options, key='reminder_{}'.format(vaccine['id'])), sg.Push(), sg.Text('${:.2f}'.format(float(vaccine['price'])))])
+		vaccines_list.append([sg.Push(), sg.Checkbox(vaccine['name'], key='vaccine_{}'.format(vaccine['id']), size=(35, 1), default=True), sg.Push(), sg.Combo(reminder_options, key='reminder_{}'.format(vaccine['id'])), sg.Push(), sg.Text('${:.2f}'.format(float(vaccine['price'])))])
 		vaccine_total += vaccine['price']
 		if vaccine['name'] in vaccines_available:
 			vaccines_available.pop(vaccines_available.index(vaccine['name']))
@@ -131,13 +133,15 @@ def main_window(session, appointment_id: int):
 		final_total -= payment['amount']
 	vaccines_list.append([sg.HorizontalSeparator()])
 	vaccines_list.append([sg.Push(), sg.Text('Remaining Balance: {:.2f}'.format(final_total))])
+	vaccines_list.append([sg.VPush()])
 
 	wellness_rabies = [
 		[sg.Push(), sg.Text("Wellness", font=('Arial', 14, 'bold')), sg.Push()],
-		[sg.Push(), sg.Text('Behavior Alert'), sg.Checkbox('', key='animal_caution', default=appointment_details['animalCaution']), sg.Push()],
-		[sg.Push(), sg.Text('Respiratory'), sg.Combo(['Normal', 'Abnormal'], key='respiratory', default_value='Normal'), sg.Push()],
-		[sg.Push(), sg.Text('Weight'), sg.InputText('', size=(5, 1), key='weight'), sg.Push()],
-		[sg.Push(), sg.Text('Temperature'), sg.InputText('', size=(5, 1), key='temperature'), sg.Push()],
+		[sg.Push(), sg.Text('Veterinarian'), sg.Combo(veterinarians, key='vet', default_value='Lisa Burnett', size=(18, 1))],
+		[sg.Push(), sg.Text('Behavior Alert'), sg.Checkbox('', key='animal_caution', default=appointment_details['animalCaution'], size=(20, 1))],
+		[sg.Push(), sg.Text('Respiratory'), sg.Combo(['Normal', 'Abnormal'], key='respiratory', default_value='Normal', size=(18, 1))],
+		[sg.Push(), sg.Text('Weight'), sg.InputText('', size=(20, 1), key='weight')],
+		[sg.Push(), sg.Text('Temperature'), sg.InputText('', size=(20, 1), key='temperature')],
 		[sg.HorizontalSeparator()],
 		[sg.Push(), sg.Text("Rabies", font=('Arial', 14, 'bold')), sg.Push()],
 		[sg.Push(), sg.Text('Vaccine {}')],
@@ -150,14 +154,19 @@ def main_window(session, appointment_id: int):
 		[sg.VPush()]
 	]
 
-	payments = []
+	microchip = [
+		[sg.Push(), sg.Text("Microchip", font=('Arial', 14, 'bold')), sg.Push()],
+		[sg.Push(), sg.Text('Provider'), sg.Combo(microchip_providers_list, key='microchip_provider', default_value='24PetWatch')],
+		[sg.Push(), sg.Text('Chip ID'), sg.InputText("", justification='left', size=(20, 1), key='microchip_id')],
+		[sg.HorizontalSeparator()]
+	]
 
 	layout = [[sg.Column(left_titles), sg.Column(left_fields), sg.VerticalSeparator(), sg.Column(right_titles), sg.Column(right_fields)],
 			  [sg.HorizontalSeparator()],
-			  [sg.Column(vaccines_list), sg.VerticalSeparator(), sg.Column(wellness_rabies), sg.VerticalSeparator(), sg.Column(payments)],
+			  [sg.Column(vaccines_list, expand_y=True), sg.VerticalSeparator(), sg.Column(wellness_rabies, expand_y=True), sg.VerticalSeparator(), sg.Column(microchip, expand_y=True, expand_x=True)],
 	]
 
-	return sg.Window('SPCA NN - Checkout', layout).finalize()
+	return sg.Window('SPCA NN - Checkout', layout, resizable=True).finalize()
 
 
 login_successful = False

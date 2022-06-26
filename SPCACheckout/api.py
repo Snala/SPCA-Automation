@@ -194,5 +194,22 @@ class ClinicHQ:
 		"""
 		return self.request('/api/checkout/financial/{}'.format(appointment_id)).json()
 
+	def microchip_providers(self):
+		"""
+		Retrieves the list of microchip providers.
+		Returns:
+			Microchip providers dictionary.
+		"""
+		return self.request('/api/common/microchip/providers').json()
+
+	def microchip_details(self, animal_id: int):
+		"""
+		Returns the microchip information for the specified animal.
+		Args:
+			animal_id: ID of the animal to retrieve.
+		Returns:
+			Microchip attributes dictionary.
+		"""
+		return self.request("/api/common/microchip/{}".format(animal_id)).json()
 
 
