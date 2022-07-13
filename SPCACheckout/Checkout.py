@@ -4,6 +4,31 @@ from SPCACheckout import api
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
+
+class CheckoutData:
+	def __init__(self, user: str, password: str):
+		self.session = api.ClinicHQ(user.strip(), password.strip())
+		self.appointment_details = None
+		self.appointment_id = int()
+
+	def refresh_details(self):
+		self.appointment_details = self.session.get_appointment_details(self.appointment_id)
+
+	def return_details(self):
+		return self.appointment_details
+
+	def get_details(self, appointment_id: int):
+		self.appointment_id = appointment_id
+		self.refresh_details()
+		return self.return_details()
+
+	def details_changed(self, details):
+		if details != self.appointment_details:
+			return True
+		else:
+			return False
+
+
 sg.theme('TanBlue')
 
 login_layout = [
@@ -23,11 +48,11 @@ def bool_to_yes_no(boolean: bool):
 
 def search_window():
 	search_layout = [
-		[sg.Push(), sg.Text('Appointment ID'), sg.InputText('', key='appointment_id', size=(12, 1), do_not_clear=False, focus=True), sg.Push()],
+		[sg.Push(), sg.Text('Appointment ID'), sg.InputText('24114190', key='appointment_id', size=(12, 1), do_not_clear=True, focus=True), sg.Push()],
 		[sg.Push(), sg.Button('Search', bind_return_key=True), sg.Button('Quit'), sg.Push()]
 	]
 
-	return sg.Window('SPCA NN - Search', search_layout).finalize()
+	return sg.Window('SPCA NN - Search', search_layout, finalize=True)
 
 
 def main_window(session, appointment_id: int):
@@ -174,7 +199,7 @@ while True:
 	login_event, login_values = login_window.read()
 	if login_event == 'Login':
 		try:
-			session = api.ClinicHQ(login_values['UserName'].strip(), login_values['Password'].strip())
+			session = CheckoutData(login_values['UserName'].strip(), login_values['Password'].strip())
 			login_successful = True
 		except json.JSONDecodeError:
 			pass
