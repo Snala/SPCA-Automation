@@ -1,0 +1,24 @@
+{
+   "action": {
+      "default_icon": {
+         "128": "/images/SPCA-Logo-Trimmed.png",
+         "256": "/images/SPCA-Logo-Trimmed@2x.png",
+         "384": "/images/SPCA-Logo-Trimmed@3x.png",
+         "64": "/images/SPCA-Logo-Trimmed@0.5x.png"
+      },
+      "default_popup": "popup.html"
+   },
+   "host_permissions": [
+      "*://*.clinichq.com/"
+   ],
+   "permissions": [
+      "cookies"
+   ],
+   "description": "A quick checkout extension for SPCA of Northern Nevada, using appointment ID's.",
+   "manifest_version": 3,
+   "name": "SPCA-NN QuickCheckout",
+   "version": "0.0.0.1",
+   "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https://clinichq.com/;"
+}
+}
