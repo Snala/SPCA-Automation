@@ -226,31 +226,31 @@ class Details:
 			if str(appointment['species']).lower() == 'dog':
 				for item in appointment['services']:
 					if 'Rabies' in item:
-						search_terms.append('Rabies: $15')
+						search_terms.append('Rabies: $')
 					elif 'DAPP' in item:
-						search_terms.append('Distemper/Parvo: $15')
+						search_terms.append('Distemper/Parvo: $')
 					elif 'Bordetella' in item:
-						search_terms.append('Bordetella: $15')
+						search_terms.append('Bordetella: $')
 					elif 'Influenza' in item:
-						search_terms.append('Flu: $30')
+						search_terms.append('Flu: $')
 					elif 'Microchip' in item:
-						search_terms.append('Microchip: $15')
+						search_terms.append('Microchip: $')
 					elif 'Dewormer' in item:
-						search_terms.append('De-Worm: $5')
+						search_terms.append('De-Worm: $')
 				clip = fitz.Rect(rect.x0, rect.y1 / 2, rect.x1 / 3, rect.y1)
 			# page.draw_rect(clip, color=(0, 0, 0), fill=(0, 0, 0), overlay=True)
 			elif str(appointment['species']).lower() == 'cat':
 				for item in appointment['services']:
 					if 'Rabies' in item:
-						search_terms.append('Rabies: $15')
+						search_terms.append('Rabies: $')
 					elif 'FVRCP' in item:
-						search_terms.append('FVRCP: $15')
+						search_terms.append('FVRCP: $')
 					elif 'Leukemia' in item:
-						search_terms.append('Feline Leukemia: $15')
+						search_terms.append('Feline Leukemia: $')
 					elif 'Microchip' in item:
-						search_terms.append('Microchip: $15')
+						search_terms.append('Microchip: $')
 					elif 'Dewormer' in item:
-						search_terms.append('De-Worm: $5')
+						search_terms.append('De-Worm: $')
 				mp = (rect.tl + rect.br) / 2  # its middle point, becomes top-left of clip
 				clip = fitz.Rect(mp, rect.br)  # the area we want
 			# page.draw_rect(clip, color=None, fill=None, overlay=False)
@@ -260,6 +260,10 @@ class Details:
 				i_rects = page.search_for(term, clip=clip, quad=False)
 				for i in i_rects:
 					if i in clip:
+						i.x0 -= 2
+						i.y0 -= 1
+						i.x0 += 1
+						i.x1 += 13
 						page.draw_rect(i, color=(0, 0, 0), fill=None, overlay=False)  # draw i
 			time_location = fitz.Rect(290, 100, 355, 121)
 			page.draw_rect(time_location, color=(1, 1, 1), fill=(1, 1, 1))
