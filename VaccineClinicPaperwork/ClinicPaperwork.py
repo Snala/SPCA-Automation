@@ -316,6 +316,19 @@ class Details:
 				result.insert_pdf(merged_file, to_page=0)
 		result.save(destination_path, garbage=1, deflate=True, clean=True)
 
+	def generate_email_list(self):
+		with open(os.path.join(Path.home(), "Downloads", "Email List " + self.date + ".txt"), 'w') as email_file:
+			email_list = []
+			for appointment in self.appointment_list:
+				if appointment['clientEmail']:
+					regex = r'^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$'
+					if re.fullmatch(regex, appointment['clientEmail'].strip(), re.IGNORECASE) and appointment['clientEmail'].strip() not in email_list:
+						email_list.append(appointment['clientEmail'].strip())
+			for email in email_list:
+				email_file.write(f'{email}\n')
+			email_file.close()
+
+
 	@staticmethod
 	def cleanup():
 		directories = [os.path.join(tempfile.gettempdir(), 'completed/'), os.path.join(tempfile.gettempdir(), 'pdfs/')]
@@ -358,6 +371,8 @@ if __name__ == "__main__":
 	test.merge_pdfs()
 	print('PDF\'s Generated, Generating Reminder Summary List')
 	test.generate_reminder_summary()
+	print("Done, writing email list.")
+	test.generate_email_list()
 	print("Done, cleaning up.")
 	test.cleanup()
 	print("Cleanup done, exiting.")
